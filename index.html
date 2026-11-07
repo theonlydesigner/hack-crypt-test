@@ -6,7 +6,6 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Hack Crypt Test</title>
 
-    <!-- Correct Supabase CDN -->
     <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
 
     <style>
@@ -15,9 +14,11 @@
             display: flex;
             justify-content: center;
             align-items: center;
-            height: 100vh;
+            min-height: 100vh;
             background-color: #f4f4f9;
             margin: 0;
+            padding: 20px;
+            box-sizing: border-box;
         }
 
         .form-container {
@@ -39,7 +40,9 @@
             font-weight: bold;
         }
 
-        input[type="text"], textarea {
+        input[type="text"],
+        input[type="email"],
+        textarea {
             width: 100%;
             padding: 10px;
             border: 1px solid #ccc;
@@ -93,7 +96,6 @@
 
         <div class="form-group">
             <label for="slackId">Slack User ID</label>
-
             <input
                 type="text"
                 id="slackId"
@@ -103,8 +105,17 @@
         </div>
 
         <div class="form-group">
-            <label for="answer">Your Answer</label>
+            <label for="email">Email Address</label>
+            <input
+                type="email"
+                id="email"
+                placeholder="Enter your email address"
+                required
+            >
+        </div>
 
+        <div class="form-group">
+            <label for="answer">Your Answer</label>
             <textarea
                 id="answer"
                 placeholder="Type your answer here..."
@@ -127,15 +138,11 @@
 </div>
 
 <script>
-
-    // 1. Supabase configuration
-
-    const SUPABASE_URL = "https://slcrxdmnpgyjjmrjvfvm.supabase.co";
+    const SUPABASE_URL =
+        "https://slcrxdmnpgyjjmrjvfvm.supabase.co";
 
     const SUPABASE_ANON_KEY =
         "sb_publishable_L7_2BdXQ_oPDYfKVXL0PoQ_YUKyJu1m";
-
-    // 2. Initialize Supabase
 
     const { createClient } = window.supabase;
 
@@ -144,14 +151,13 @@
         SUPABASE_ANON_KEY
     );
 
-    // 3. Handle form submission
-
     document.getElementById("slackForm")
         .addEventListener("submit", async (e) => {
 
         e.preventDefault();
 
-        const submitBtn = document.getElementById("submitBtn");
+        const submitBtn =
+            document.getElementById("submitBtn");
 
         const responseMessage =
             document.getElementById("responseMessage");
@@ -159,13 +165,16 @@
         const slackUserId =
             document.getElementById("slackId").value.trim();
 
+        const email =
+            document.getElementById("email").value.trim();
+
         const answerVal =
             document.getElementById("answer").value.trim();
 
-        if (!slackUserId || !answerVal) {
+        if (!slackUserId || !email || !answerVal) {
             responseMessage.style.color = "red";
             responseMessage.innerText =
-                "Please fill in both fields.";
+                "Please fill in all fields.";
             return;
         }
 
@@ -175,14 +184,12 @@
         responseMessage.innerText = "";
 
         try {
-
-            // 4. Insert into Supabase
-
             const { error } = await supabaseClient
                 .from("slack_responses")
                 .insert([
                     {
                         slack_user_id: slackUserId,
+                        email: email,
                         answer: answerVal
                     }
                 ]);
@@ -191,35 +198,24 @@
                 throw error;
             }
 
-            // 5. Success message
-
             responseMessage.style.color = "green";
-
             responseMessage.innerText =
                 "Logged successfully! 🎉";
 
             document.getElementById("slackForm").reset();
 
         } catch (error) {
-
             console.error("Supabase Error:", error);
 
             responseMessage.style.color = "red";
-
             responseMessage.innerText =
                 "Error: " + error.message;
 
         } finally {
-
             submitBtn.disabled = false;
-
-            submitBtn.innerText =
-                "Submit to Supabase";
-
+            submitBtn.innerText = "Submit";
         }
-
     });
-
 </script>
 
 </body>
