@@ -37,8 +37,8 @@
 </div>
 
 <script>
-    // 1. Initialize your Supabase client
-    const SUPABASE_URL = "https://slcrxdmnpgyjjmrjvfvm.supabase.co/rest/v1/"; 
+    // 1. Corrected Supabase client initialization
+    const SUPABASE_URL = "https://slcrxdmnpgyjjmrjvfvm.supabase.co"; 
     const SUPABASE_ANON_KEY = "sb_publishable_L7_2BdXQ_oPDYfKVXL0PoQ_YUKyJu1m";
     const supabase = Supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
@@ -77,6 +77,5 @@
         submitBtn.innerText = "Submit to Supabase";
     });
 </script>
-
 </body>
 </html>
