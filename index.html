@@ -1,81 +1,226 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <title>Slack ID Submission Form</title>
-    <!-- Include the Supabase JS Library via CDN -->
-    <script src="https://jsdelivr.net"></script>
+
+    <!-- Correct Supabase CDN -->
+    <script src="https://cdn.jsdelivr.net/npm/@supabase/supabase-js@2"></script>
+
     <style>
-        body { font-family: Arial, sans-serif; display: flex; justify-content: center; align-items: center; height: 100vh; background-color: #f4f4f9; margin: 0; }
-        .form-container { background: white; padding: 30px; border-radius: 8px; box-shadow: 0 4px 6px rgba(0,0,0,0.1); width: 100%; max-width: 400px; }
-        .form-group { margin-bottom: 15px; }
-        label { display: block; margin-bottom: 5px; font-weight: bold; }
-        input[type="text"], textarea { width: 100%; padding: 10px; border: 1px solid #ccc; border-radius: 4px; box-sizing: border-box; }
-        textarea { resize: vertical; height: 100px; }
-        button { width: 100%; padding: 12px; background-color: #4A154B; color: white; border: none; border-radius: 4px; font-size: 16px; cursor: pointer; font-weight: bold; }
-        button:hover { background-color: #611f62; }
-        .message { margin-top: 15px; text-align: center; font-weight: bold; }
+        body {
+            font-family: Arial, sans-serif;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            height: 100vh;
+            background-color: #f4f4f9;
+            margin: 0;
+        }
+
+        .form-container {
+            background: white;
+            padding: 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 6px rgba(0,0,0,0.1);
+            width: 100%;
+            max-width: 400px;
+        }
+
+        .form-group {
+            margin-bottom: 15px;
+        }
+
+        label {
+            display: block;
+            margin-bottom: 5px;
+            font-weight: bold;
+        }
+
+        input[type="text"], textarea {
+            width: 100%;
+            padding: 10px;
+            border: 1px solid #ccc;
+            border-radius: 4px;
+            box-sizing: border-box;
+        }
+
+        textarea {
+            resize: vertical;
+            height: 100px;
+        }
+
+        button {
+            width: 100%;
+            padding: 12px;
+            background-color: #4A154B;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            font-size: 16px;
+            cursor: pointer;
+            font-weight: bold;
+        }
+
+        button:hover {
+            background-color: #611f62;
+        }
+
+        button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .message {
+            margin-top: 15px;
+            text-align: center;
+            font-weight: bold;
+        }
     </style>
 </head>
+
 <body>
 
 <div class="form-container">
-    <h2 style="color: #4A154B; margin-top: 0;">Submit Your Answer</h2>
+
+    <h2 style="color: #4A154B; margin-top: 0;">
+        Submit Your Answer
+    </h2>
+
     <form id="slackForm">
+
         <div class="form-group">
             <label for="slackId">Slack User ID</label>
-            <input type="text" id="slackId" placeholder="e.g., U12345678" required>
+
+            <input
+                type="text"
+                id="slackId"
+                placeholder="e.g., U12345678"
+                required
+            >
         </div>
+
         <div class="form-group">
             <label for="answer">Your Answer</label>
-            <textarea id="answer" placeholder="Type your answer here..." required></textarea>
+
+            <textarea
+                id="answer"
+                placeholder="Type your answer here..."
+                required
+            ></textarea>
         </div>
-        <button type="submit" id="submitBtn">Submit to Supabase</button>
+
+        <button type="submit" id="submitBtn">
+            Submit to Supabase
+        </button>
+
     </form>
-    <div id="responseMessage" class="message"></div>
+
+    <div
+        id="responseMessage"
+        class="message"
+        role="status"
+    ></div>
+
 </div>
 
 <script>
-    // 1. Corrected Supabase client initialization
-    const SUPABASE_URL = "https://slcrxdmnpgyjjmrjvfvm.supabase.co"; 
-    const SUPABASE_ANON_KEY = "sb_publishable_L7_2BdXQ_oPDYfKVXL0PoQ_YUKyJu1m";
-    const supabase = Supabase.createClient(SUPABASE_URL, SUPABASE_ANON_KEY);
 
-    // 2. Handle the form submission
-    document.getElementById('slackForm').addEventListener('submit', async (e) => {
+    // 1. Supabase configuration
+
+    const SUPABASE_URL = "https://slcrxdmnpgyjjmrjvfvm.supabase.co";
+
+    const SUPABASE_ANON_KEY =
+        "YOUR_SUPABASE_PUBLISHABLE_KEY";
+
+    // 2. Initialize Supabase
+
+    const { createClient } = window.supabase;
+
+    const supabaseClient = createClient(
+        SUPABASE_URL,
+        SUPABASE_ANON_KEY
+    );
+
+    // 3. Handle form submission
+
+    document.getElementById("slackForm")
+        .addEventListener("submit", async (e) => {
+
         e.preventDefault();
-        
-        const submitBtn = document.getElementById('submitBtn');
-        const responseMessage = document.getElementById('responseMessage');
-        
-        const slackUserId = document.getElementById('slackId').value.trim();
-        const answerVal = document.getElementById('answer').value.trim();
-        
-        // Prevent double clicks
-        submitBtn.disabled = true;
-        submitBtn.innerText = "Submitting...";
-        responseMessage.innerText = "";
 
-        // 3. Insert the data into your Supabase table
-        const { data, error } = await supabase
-            .from('slack_responses')
-            .insert([
-                { slack_user_id: slackUserId, answer: answerVal }
-            ]);
+        const submitBtn = document.getElementById("submitBtn");
 
-        if (error) {
+        const responseMessage =
+            document.getElementById("responseMessage");
+
+        const slackUserId =
+            document.getElementById("slackId").value.trim();
+
+        const answerVal =
+            document.getElementById("answer").value.trim();
+
+        if (!slackUserId || !answerVal) {
             responseMessage.style.color = "red";
-            responseMessage.innerText = "Error: " + error.message;
-        } else {
-            responseMessage.style.color = "green";
-            responseMessage.innerText = "Logged successfully! 🎉";
-            document.getElementById('slackForm').reset();
+            responseMessage.innerText =
+                "Please fill in both fields.";
+            return;
         }
 
-        submitBtn.disabled = false;
-        submitBtn.innerText = "Submit to Supabase";
+        submitBtn.disabled = true;
+        submitBtn.innerText = "Submitting...";
+
+        responseMessage.innerText = "";
+
+        try {
+
+            // 4. Insert into Supabase
+
+            const { error } = await supabaseClient
+                .from("slack_responses")
+                .insert([
+                    {
+                        slack_user_id: slackUserId,
+                        answer: answerVal
+                    }
+                ]);
+
+            if (error) {
+                throw error;
+            }
+
+            // 5. Success message
+
+            responseMessage.style.color = "green";
+
+            responseMessage.innerText =
+                "Logged successfully! 🎉";
+
+            document.getElementById("slackForm").reset();
+
+        } catch (error) {
+
+            console.error("Supabase Error:", error);
+
+            responseMessage.style.color = "red";
+
+            responseMessage.innerText =
+                "Error: " + error.message;
+
+        } finally {
+
+            submitBtn.disabled = false;
+
+            submitBtn.innerText =
+                "Submit to Supabase";
+
+        }
+
     });
+
 </script>
+
 </body>
 </html>
